@@ -1,0 +1,9 @@
+.gradle/
+build/
+out/
+lib/
+lib-mcp-ref/
+tool/.build/
+tool/.deps/
+*.class
+.DS_Store

@@ -1,0 +1,10 @@
+# Forge-added vanilla members referenced by myau sources.
+# These exist in the game at runtime (Forge patches vanilla classes) but in no
+# published jar, so the CI dep pipeline synthesizes compile-only stubs for them
+# (see tool/fetch-deps.sh). Bodies return type defaults; the jar is never shipped.
+# If compileJava fails with "cannot find symbol" on a vanilla member, add it here.
+CLASS net/minecraft/item/Item
+M public getToolClasses (Lnet/minecraft/item/ItemStack;)Ljava/util/Set;
+M public getMetadata (Lnet/minecraft/item/ItemStack;)I
+M public getDigSpeed (Lnet/minecraft/item/ItemStack;Lnet/minecraft/block/state/IBlockState;)F
+M public final getRegistryName ()Ljava/lang/String;

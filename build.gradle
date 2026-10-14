@@ -1,0 +1,97 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+group = 'myau'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://repo.spongepowered.org/repository/maven-public/'
+        content { includeGroup 'org.spongepowered' }
+    }
+}
+
+configurations {
+    // Game-provided jars live in lib/ (minecraft, forge, lwjgl, ...).
+    // Keep them out of the output jar; they exist at runtime.
+    provided
+    compileOnly.extendsFrom(provided)
+    // Third-party libs the patched jar shades (mixin, gson, commons-io).
+    // These ARE bundled into the shadow jar, matching the original.
+    // Non-transitive: the game already provides guava (mixin's dep).
+    shade { transitive = false }
+}
+
+dependencies {
+    // Mixin 0.7.11: shaded in the patched jar (its TweakClass entry needs it).
+    shade 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
+    compileOnly 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
+    shade 'com.google.code.gson:gson:2.2.4'
+    shade 'commons-io:commons-io:2.4'
+    implementation 'org.apache.commons:commons-lang3:3.3.2'
+    implementation 'org.apache.logging.log4j:log4j-api:2.0-beta9'
+    // authlib 1.5.21 is not on Maven Central; use the game jar in lib/.
+    implementation files('lib/authlib-1.5.21.jar')
+    implementation 'io.netty:netty-all:4.0.23.Final'
+
+    // Minecraft / Forge: SRG-named (sources use func_/field_ names, i.e.
+    // production mappings) PLUS forge-added methods (getToolClasses, ...).
+    // Neither cache jar has both, so lib/merged-srg-forge.jar fuses them:
+    // srgBin base + forgeBin methods/fields missing by name+desc.
+    // COMPILE-ONLY: never shipped; the game provides real classes at runtime.
+    // Regenerate with the MergeSrgs tool if the cache jars change.
+    provided files('lib/merged-srg-forge.jar')
+    // LWJGL + misc: provided by the game, compile-only.
+    provided files('lib/lwjgl-2.9.4-nightly-20150209.jar')
+    provided files('lib/lwjgl_util-2.9.4-nightly-20150209.jar')
+    provided files('lib/authlib-1.5.21.jar')
+    provided files('lib/guava-17.0.jar')
+    provided files('lib/log4j-api-2.0-beta9.jar')
+    provided files('lib/netty-all-4.0.23.Final.jar')
+}
+
+sourceSets {
+    main {
+        java { srcDirs = ['src/main/java'] }
+        resources { srcDirs = ['src/main/resources'] }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    // Mixin ships an annotation processor; it needs guava on the
+    // processor path and fails the build. We only need its annotations.
+    options.compilerArgs += ['-proc:none']
+}
+
+// Drop-in replacement for myau-deof-runnable.jar: mod classes + resources
+// plus the shaded third-party libs the patched jar bundles.
+// The plain `jar` task is disabled; `shadowJar` takes its place and
+// produces the single artifact build/libs/myau-1.0.0.jar.
+jar {
+    enabled = false
+}
+
+shadowJar {
+    archiveBaseName = 'myau'
+    archiveClassifier = ''
+    configurations = [project.configurations.shade]
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            'ModSide': 'CLIENT',
+            'ForceLoadAsMod': 'true',
+            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+            'TweakOrder': '0',
+            'MixinConfigs': 'mixins.myau.json'
+        )
+    }
+}
