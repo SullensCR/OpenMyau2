@@ -2,6 +2,8 @@
 
 OpenMyau, again!
 
+> [!TIP]
+> Download it from [Actions](https://github.com/SullensCR/OpenMyau2/actions)
 Based on Myau 260729 from Skid Solutions, credits to them
 
 ClickGUI pasted from Raven b3 with help and vibes from Deepseek :3 
