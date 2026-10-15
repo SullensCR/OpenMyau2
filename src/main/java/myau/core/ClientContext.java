@@ -65,6 +65,7 @@ import myau.module.render.Chams;
 import myau.module.render.ChestESP;
 import myau.module.render.ESP;
 import myau.module.render.Fullbright;
+import myau.module.render.GuiModule;
 import myau.module.render.HeadsUpDisplay;
 import myau.module.render.Indicators;
 import myau.module.render.ItemESP;
@@ -170,6 +171,7 @@ public final class ClientContext {
       registerModule(new Fly());
       registerModule(new Fullbright());
       registerModule(new GhostHand());
+      registerModule(new GuiModule());
       registerModule(new HitSelect());
       registerModule(new HeadsUpDisplay());
       registerModule(new Indicators());

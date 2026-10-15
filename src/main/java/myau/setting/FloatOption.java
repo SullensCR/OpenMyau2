@@ -17,6 +17,14 @@ public class FloatOption extends Option<Float> {
       this.max = max;
    }
 
+   public Float getMin() {
+      return this.min;
+   }
+
+   public Float getMax() {
+      return this.max;
+   }
+
    @Override
    public String getUsage() {
       return String.format("%s-%s", this.min, this.max);

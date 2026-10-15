@@ -22,6 +22,14 @@ public class PercentOption extends Option<Integer> {
       this.max = max;
    }
 
+   public Integer getMin() {
+      return this.min;
+   }
+
+   public Integer getMax() {
+      return this.max;
+   }
+
    @Override
    public String getUsage() {
       return String.format("%d-%d%%", this.min, this.max);
